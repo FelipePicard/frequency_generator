@@ -11,7 +11,7 @@ int bntCount = 0;
 int increment = 0;
 #define ledPin 13
 
-#define genPin 3
+#define genPin 4
 long freq = 0;
 long oldPosition  = 0;
 long oldfreq = 20;
