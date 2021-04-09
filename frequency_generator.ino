@@ -7,7 +7,7 @@ Encoder myEnc(6, 5);
 #define btnPin 7
 bool btnState = HIGH;
 bool lastbtnState = HIGH;
-int bntCount = 0;
+int btnCount = 0;
 int increment = 0;
 #define ledPin 13
 
@@ -15,6 +15,7 @@ int increment = 0;
 long freq = 0;
 long oldPosition  = 0;
 long oldfreq = 20;
+long correction = 0;
 int mult;
 
 #define SCREEN_WIDTH 128
@@ -41,26 +42,31 @@ void setup() {
 void loop() {
   btnState = digitalRead(btnPin);
   long newPosition = (myEnc.read())/4;
-  Serial.println(oldPosition);
-
+  long Position = newPosition - correction;
+  Serial.println((Position - oldPosition));
+  
   if(btnState == LOW){
     increment ++;
-    oldPosition = newPosition;
+    oldPosition = Position;
     oldfreq = freq;
     delay(300);
   }
-
-  freq = oldfreq + (newPosition - oldPosition)*pow(10, increment);
+  
+  freq = oldfreq + (Position - oldPosition)*pow(10, increment);
 
   mult = pow(10, increment);
-    
+
+  if(freq < 20){
+    freq = 20;
+    correction = newPosition;
+    oldPosition = 0;
+    oldfreq = freq;
+  }
+  
   if(increment > 4){
     increment = 0;
   }
 
-  if(freq < 20){
-    freq = 20;
-  }
 
   analogWriteFrequency(genPin, freq);
   analogWrite(genPin, 128);
